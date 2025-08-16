@@ -1,0 +1,65 @@
+# Winky-Coder Code Owners
+# This file defines who is responsible for different parts of the codebase
+
+# Global owners - all files
+* @winky-a1
+
+# Backend Runtime
+backend/src/services/productionRuntime.js @winky-a1
+backend/src/services/productionEmulator.js @winky-a1
+backend/src/services/ownRuntime.js @winky-a1
+
+# Text-to-App Prototype Generator
+frontend/src/components/TextToAppGenerator.tsx @winky-a1
+backend/src/routes/textToApp.js @winky-a1
+
+# AI Agent & Model Adapter
+backend/src/services/aiService.js @winky-a1
+backend/src/routes/ai.js @winky-a1
+frontend/src/services/ai.ts @winky-a1
+
+# Emulator
+backend/src/services/productionEmulator.js @winky-a1
+backend/emulators/ @winky-a1
+
+# CI/CD Pipeline
+.github/workflows/ @winky-a1
+.github/CODEOWNERS @winky-a1
+
+# Security
+backend/src/middleware/auth.js @winky-a1
+backend/src/middleware/security.js @winky-a1
+backend/src/services/vault.js @winky-a1
+
+# Database & Storage
+backend/src/services/database.js @winky-a1
+backend/src/services/storage.js @winky-a1
+backend/migrations/ @winky-a1
+
+# Frontend Core
+frontend/src/App.tsx @winky-a1
+frontend/src/components/ @winky-a1
+frontend/src/services/ @winky-a1
+
+# Configuration Files
+package.json @winky-a1
+vercel.json @winky-a1
+docker-compose.yml @winky-a1
+Dockerfile @winky-a1
+
+# Documentation
+README.md @winky-a1
+DECISION.md @winky-a1
+docs/ @winky-a1
+
+# Tests
+**/*.test.js @winky-a1
+**/*.test.ts @winky-a1
+**/*.spec.js @winky-a1
+**/*.spec.ts @winky-a1
+test/ @winky-a1
+tests/ @winky-a1
+
+# Environment & Secrets
+.env* @winky-a1
+secrets/ @winky-a1

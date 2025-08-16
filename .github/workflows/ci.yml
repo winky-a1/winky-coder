@@ -1,0 +1,738 @@
+name: Winky-Coder CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  POSTGRES_VERSION: '15'
+  REDIS_VERSION: '7'
+
+jobs:
+  # ============================================================================
+  # DEPENDENCY INSTALLATION & SECURITY SCANS
+  # ============================================================================
+  
+  install-and-scan:
+    name: Install Dependencies & Security Scans
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install frontend dependencies
+        working-directory: ./frontend
+        run: |
+          npm ci
+          npm audit --audit-level=moderate
+          
+      - name: Install backend dependencies
+        working-directory: ./backend
+        run: |
+          npm ci
+          npm audit --audit-level=moderate
+          
+      - name: Run SAST (Static Application Security Testing)
+        uses: github/codeql-action/init@v3
+        with:
+          languages: javascript, typescript
+          
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+          
+      - name: Check for secrets in code
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: .
+          base: ${{ github.event.pull_request.base.sha || 'HEAD~1' }}
+          head: HEAD
+          
+      - name: Run dependency vulnerability scan
+        run: |
+          cd frontend && npm audit --audit-level=moderate --json > frontend-audit.json
+          cd ../backend && npm audit --audit-level=moderate --json > backend-audit.json
+          
+      - name: Upload audit results
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-results
+          path: |
+            frontend/frontend-audit.json
+            backend/backend-audit.json
+
+  # ============================================================================
+  # LINTING & FORMATTING
+  # ============================================================================
+  
+  lint-and-format:
+    name: Lint & Format Check
+    runs-on: ubuntu-latest
+    needs: install-and-scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Run ESLint (Frontend)
+        working-directory: ./frontend
+        run: |
+          npm run lint
+          npm run lint:check
+          
+      - name: Run ESLint (Backend)
+        working-directory: ./backend
+        run: |
+          npm run lint
+          npm run lint:check
+          
+      - name: Check TypeScript types (Frontend)
+        working-directory: ./frontend
+        run: npm run type-check
+        
+      - name: Check code formatting
+        run: |
+          cd frontend && npm run format:check
+          cd ../backend && npm run format:check
+
+  # ============================================================================
+  # UNIT TESTS
+  # ============================================================================
+  
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: install-and-scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Run frontend unit tests
+        working-directory: ./frontend
+        run: |
+          npm run test:unit
+          npm run test:coverage
+          
+      - name: Run backend unit tests
+        working-directory: ./backend
+        run: |
+          npm run test:unit
+          npm run test:coverage
+          
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          
+      - name: Check test coverage threshold
+        run: |
+          # Ensure coverage is >= 95% for critical modules
+          if [ $(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)") -lt 95 ]; then
+            echo "❌ Test coverage below 95% threshold"
+            exit 1
+          fi
+
+  # ============================================================================
+  # INTEGRATION TESTS (EMULATOR)
+  # ============================================================================
+  
+  integration-tests:
+    name: Integration Tests (Emulator)
+    runs-on: ubuntu-latest
+    needs: [install-and-scan, unit-tests]
+    
+    services:
+      postgres:
+        image: postgres:${{ env.POSTGRES_VERSION }}
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: winky_coder_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
+      redis:
+        image: redis:${{ env.REDIS_VERSION }}
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Setup test environment
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/winky_coder_test" >> $GITHUB_ENV
+          echo "REDIS_URL=redis://localhost:6379" >> $GITHUB_ENV
+          echo "JWT_SECRET=test-secret-key" >> $GITHUB_ENV
+          
+      - name: Start emulator
+        working-directory: ./backend
+        run: |
+          npm run emulator:start
+          
+      - name: Wait for emulator to be ready
+        run: |
+          sleep 30
+          
+      - name: Run emulator parity tests
+        working-directory: ./backend
+        run: npm run test:emulator:parity
+        
+      - name: Run integration tests
+        working-directory: ./backend
+        run: npm run test:integration
+        
+      - name: Run frontend integration tests
+        working-directory: ./frontend
+        run: npm run test:integration
+        
+      - name: Stop emulator
+        working-directory: ./backend
+        run: npm run emulator:stop
+        if: always()
+
+  # ============================================================================
+  # PERFORMANCE TESTS
+  # ============================================================================
+  
+  performance-tests:
+    name: Performance Smoke Tests
+    runs-on: ubuntu-latest
+    needs: [install-and-scan, unit-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+        
+      - name: Start backend server
+        working-directory: ./backend
+        run: |
+          npm run start:test &
+          sleep 10
+          
+      - name: Run performance tests
+        run: |
+          # Test API response times
+          curl -w "@curl-format.txt" -o /dev/null -s "http://localhost:3000/api/health"
+          
+          # Test function cold start times
+          npm run test:performance
+          
+      - name: Check performance thresholds
+        run: |
+          # Ensure API response time < 100ms
+          # Ensure function cold start < 500ms
+          npm run test:performance:thresholds
+
+  # ============================================================================
+  # CONTAINER SECURITY SCAN
+  # ============================================================================
+  
+  container-scan:
+    name: Container Security Scan
+    runs-on: ubuntu-latest
+    needs: install-and-scan
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Build Docker images
+        run: |
+          docker build -t winky-coder/frontend:test ./frontend
+          docker build -t winky-coder/backend:test ./backend
+          docker build -t winky-coder/auth-emulator:test ./backend/emulators/auth
+          docker build -t winky-coder/functions-emulator:test ./backend/emulators/functions
+          
+      - name: Run Trivy container scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'winky-coder/frontend:test'
+          format: 'sarif'
+          output: 'trivy-container-frontend.sarif'
+          
+      - name: Run Trivy container scan (Backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'winky-coder/backend:test'
+          format: 'sarif'
+          output: 'trivy-container-backend.sarif'
+          
+      - name: Upload container scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: |
+            trivy-container-frontend.sarif
+            trivy-container-backend.sarif
+
+  # ============================================================================
+  # E2E TESTS
+  # ============================================================================
+  
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: [integration-tests, performance-tests]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Setup test environment
+        run: |
+          echo "DATABASE_URL=postgresql://postgres:postgres@localhost:5432/winky_coder_test" >> $GITHUB_ENV
+          echo "REDIS_URL=redis://localhost:6379" >> $GITHUB_ENV
+          echo "JWT_SECRET=test-secret-key" >> $GITHUB_ENV
+          
+      - name: Start full stack
+        run: |
+          cd backend && npm run start:test &
+          cd frontend && npm run start:test &
+          sleep 30
+          
+      - name: Run E2E tests
+        run: |
+          npm run test:e2e
+          
+      - name: Test AI agent approval flow
+        run: |
+          npm run test:e2e:ai-approval
+
+  # ============================================================================
+  # SECURITY REVIEW
+  # ============================================================================
+  
+  security-review:
+    name: Security Review
+    runs-on: ubuntu-latest
+    needs: [install-and-scan, container-scan, e2e-tests]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Download scan results
+        uses: actions/download-artifact@v4
+        with:
+          name: audit-results
+          
+      - name: Run security review
+        run: |
+          # Check for critical vulnerabilities
+          if grep -q '"severity": "critical"' frontend-audit.json; then
+            echo "❌ Critical vulnerabilities found in frontend dependencies"
+            exit 1
+          fi
+          
+          if grep -q '"severity": "critical"' backend-audit.json; then
+            echo "❌ Critical vulnerabilities found in backend dependencies"
+            exit 1
+          fi
+          
+          echo "✅ Security review passed"
+          
+      - name: Comment security findings
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let comment = '## 🔒 Security Review Results\n\n';
+            
+            try {
+              const frontendAudit = JSON.parse(fs.readFileSync('frontend-audit.json', 'utf8'));
+              const backendAudit = JSON.parse(fs.readFileSync('backend-audit.json', 'utf8'));
+              
+              const frontendVulns = frontendAudit.vulnerabilities || {};
+              const backendVulns = backendAudit.vulnerabilities || {};
+              
+              comment += `### Frontend Dependencies\n`;
+              comment += `- **High**: ${Object.values(frontendVulns).filter(v => v.severity === 'high').length}\n`;
+              comment += `- **Moderate**: ${Object.values(frontendVulns).filter(v => v.severity === 'moderate').length}\n`;
+              
+              comment += `\n### Backend Dependencies\n`;
+              comment += `- **High**: ${Object.values(backendVulns).filter(v => v.severity === 'high').length}\n`;
+              comment += `- **Moderate**: ${Object.values(backendVulns).filter(v => v.severity === 'moderate').length}\n`;
+              
+              if (Object.values(frontendVulns).length === 0 && Object.values(backendVulns).length === 0) {
+                comment += `\n✅ **No vulnerabilities found!**\n`;
+              }
+            } catch (error) {
+              comment += `\n❌ **Error reading audit results**\n`;
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+  # ============================================================================
+  # DEPLOYMENT GATES
+  # ============================================================================
+  
+  deployment-gates:
+    name: Deployment Gates
+    runs-on: ubuntu-latest
+    needs: [security-review, e2e-tests]
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Check branch naming convention
+        run: |
+          BRANCH_NAME="${{ github.head_ref }}"
+          if [[ ! $BRANCH_NAME =~ ^winky/(feat|fix|chore|docs|style|refactor|test|perf)-[a-z0-9-]+-[0-9]+$ ]]; then
+            echo "❌ Branch name '$BRANCH_NAME' does not follow convention: winky/<type>-<short-desc>-<id>"
+            exit 1
+          fi
+          echo "✅ Branch naming convention check passed"
+          
+      - name: Check commit message convention
+        run: |
+          # Check last 10 commits for conventional commits format
+          git log --oneline -10 | while read commit; do
+            if [[ ! $commit =~ ^[a-f0-9]{7}\ (feat|fix|chore|docs|style|refactor|test|perf)(\([a-z-]+\))?:\ .+ ]]; then
+              echo "❌ Commit message does not follow conventional commits format: $commit"
+              exit 1
+            fi
+          done
+          echo "✅ Commit message convention check passed"
+          
+      - name: Check for required reviewers
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const approvedReviews = reviews.filter(review => review.state === 'APPROVED');
+            
+            if (approvedReviews.length < 1) {
+              core.setFailed('❌ At least one code review approval required');
+            }
+            
+            // Check for security engineering approval for infra changes
+            const files = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            const hasInfraChanges = files.data.some(file => 
+              file.filename.includes('docker') || 
+              file.filename.includes('kubernetes') ||
+              file.filename.includes('terraform') ||
+              file.filename.includes('security')
+            );
+            
+            if (hasInfraChanges) {
+              const securityApprovals = approvedReviews.filter(review => 
+                review.user.login.includes('security') || 
+                review.user.login.includes('devops')
+              );
+              
+              if (securityApprovals.length === 0) {
+                core.setFailed('❌ Security engineering approval required for infrastructure changes');
+              }
+            }
+            
+            console.log('✅ Required approvals check passed');
+            
+      - name: Check test coverage threshold
+        run: |
+          # Ensure all critical modules have >= 95% coverage
+          if [ $(node -e "console.log(require('./coverage/coverage-summary.json').total.lines.pct)") -lt 95 ]; then
+            echo "❌ Test coverage below 95% threshold"
+            exit 1
+          fi
+          echo "✅ Test coverage threshold check passed"
+          
+      - name: Check performance thresholds
+        run: |
+          # Ensure API response time < 100ms
+          # Ensure function cold start < 500ms
+          npm run test:performance:thresholds
+          echo "✅ Performance threshold check passed"
+          
+      - name: Generate deployment summary
+        run: |
+          echo "## 🚀 Deployment Gates Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Branch naming convention" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Commit message convention" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Required approvals" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Test coverage threshold" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Performance thresholds" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Ready for deployment!** 🎉" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # STAGING DEPLOYMENT
+  # ============================================================================
+  
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: deployment-gates
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    environment: staging
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+        
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+        
+      - name: Deploy to staging
+        run: |
+          # Deploy to staging environment
+          npm run deploy:staging
+          
+      - name: Run staging smoke tests
+        run: |
+          # Wait for deployment to complete
+          sleep 60
+          
+          # Run smoke tests against staging
+          npm run test:smoke:staging
+          
+      - name: Notify staging deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🚀 Staging Deployment Complete\n\n**Environment**: Staging\n**URL**: https://staging.winky-coder.com\n**Commit**: ${context.sha}\n\n✅ Smoke tests passed\n\nReady for production deployment approval.`
+            });
+
+  # ============================================================================
+  # PRODUCTION DEPLOYMENT (MANUAL APPROVAL)
+  # ============================================================================
+  
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    environment: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: |
+          cd frontend && npm ci
+          cd ../backend && npm ci
+          
+      - name: Build frontend
+        working-directory: ./frontend
+        run: npm run build
+        
+      - name: Build backend
+        working-directory: ./backend
+        run: npm run build
+        
+      - name: Deploy to production
+        run: |
+          # Deploy to production environment
+          npm run deploy:production
+          
+      - name: Run production verification
+        run: |
+          # Wait for deployment to complete
+          sleep 120
+          
+          # Run verification tests
+          npm run test:verification:production
+          
+      - name: Create release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ github.run_number }}
+          release_name: Release v${{ github.run_number }}
+          body: |
+            ## 🚀 Production Release v${{ github.run_number }}
+            
+            **Deployed from**: ${{ github.head_ref }}
+            **Commit**: ${{ github.sha }}
+            **Environment**: Production
+            
+            ### Changes
+            - Backend runtime implementation
+            - Text-to-App prototype generator
+            - Production emulator with parity tests
+            - Comprehensive CI/CD pipeline
+            
+            ### Rollback Plan
+            If issues are detected, rollback to previous version using:
+            ```bash
+            npm run rollback:production
+            ```
+            
+            ### Monitoring
+            - [Production Dashboard](https://monitoring.winky-coder.com)
+            - [Error Tracking](https://errors.winky-coder.com)
+            - [Performance Metrics](https://metrics.winky-coder.com)
+            
+          draft: false
+          prerelease: false
+          
+      - name: Notify production deployment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## 🎉 Production Deployment Complete\n\n**Environment**: Production\n**URL**: https://winky-coder.com\n**Release**: v${context.runNumber}\n**Commit**: ${context.sha}\n\n✅ All verification tests passed\n✅ Release created\n\n**Deployment successful!** 🚀`
+            });
+
+# ============================================================================
+# WORKFLOW CONDITIONS & FAILURES
+# ============================================================================
+
+# Fail fast on critical issues
+fail-fast: false
+
+# Required status checks for main branch
+required_status_checks:
+  strict: true
+  contexts:
+    - "Install Dependencies & Security Scans"
+    - "Lint & Format Check"
+    - "Unit Tests"
+    - "Integration Tests (Emulator)"
+    - "Performance Smoke Tests"
+    - "Container Security Scan"
+    - "End-to-End Tests"
+    - "Security Review"
+    - "Deployment Gates"
