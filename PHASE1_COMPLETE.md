@@ -121,13 +121,19 @@ npm run dev
 
 ## 🔑 Required API Keys
 
-### AI Models (Add to backend/.env)
+### AI Models (Only 2 Required - Add to backend/.env)
 ```bash
 GEMINI_API_KEY=your_gemini_api_key
 OPENROUTER_API_KEY=your_openrouter_api_key
-QWEN_API_KEY=your_qwen_api_key
-DEEPSEEK_API_KEY=your_deepseek_api_key
 ```
+
+**Available Models:**
+- **Gemini**: `gemini-2.0-flash-exp` (Vision), `gemini-1.5-flash` (Coding)
+- **OpenRouter Free Models**: 
+  - `tngtech/deepseek-r1t2-chimera:free`
+  - `qwen/qwen3-coder:free`
+  - `deepseek/deepseek-r1-0528:free`
+  - `deepseek/deepseek-r1-0528-qwen3-8b:free`
 
 ### GitHub (Optional for public repos)
 ```bash
@@ -186,6 +192,12 @@ GITHUB_CLIENT_SECRET=your_github_client_secret
 - Search and execute commands
 - Keyboard navigation support
 
+### 6. Vision Analysis (NEW!)
+- Upload UI design images
+- AI analyzes design and generates code
+- Supports Gemini 2.0 Flash Exp for vision
+- Automatic model selection for vision tasks
+
 ## 🔌 API Endpoints
 
 ### Repository Management
@@ -206,6 +218,7 @@ POST /api/ai/analyze      # Analyze codebase
 POST /api/ai/refactor     # Refactor code
 POST /api/ai/fix          # Fix code issues
 POST /api/ai/explain      # Explain code
+POST /api/ai/vision       # Analyze UI design from image
 ```
 
 ### File Operations

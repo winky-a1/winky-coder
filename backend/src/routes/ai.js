@@ -261,4 +261,55 @@ router.post('/explain', async (req, res) => {
   }
 });
 
+/**
+ * @route POST /api/ai/vision
+ * @desc Analyze UI design from image and generate code
+ * @access Public
+ */
+router.post('/vision', async (req, res) => {
+  try {
+    const { 
+      imageData, 
+      prompt = 'Analyze this UI design and describe the components, layout, and styling needed to recreate it',
+      model = 'gemini-2.0-pro'
+    } = req.body;
+    
+    if (!imageData) {
+      return res.status(400).json({ 
+        error: 'Image data is required' 
+      });
+    }
+
+    const visionPrompt = `${prompt}
+
+Please provide a detailed analysis including:
+- Layout structure and components
+- Color scheme and styling
+- Typography and spacing
+- Interactive elements
+- Responsive design considerations
+
+Then provide the HTML/CSS/JavaScript code to recreate this design.`;
+
+    const result = await processAIRequest({
+      prompt: visionPrompt,
+      model,
+      context: { analysisType: 'ui-design' },
+      temperature: 0.3,
+      imageData
+    });
+
+    res.json({
+      success: true,
+      data: result
+    });
+  } catch (error) {
+    console.error('AI vision error:', error);
+    res.status(500).json({ 
+      error: 'Failed to analyze image',
+      message: error.message 
+    });
+  }
+});
+
 export default router;

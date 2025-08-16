@@ -3,42 +3,56 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // AI Model configurations
 const AI_MODELS = {
-  // Gemini Models
+  // Gemini Models (Vision + Text)
   'gemini-2.0-pro': {
     provider: 'gemini',
     model: 'gemini-2.0-flash-exp',
     apiKey: process.env.GEMINI_API_KEY,
-    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models'
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    supportsVision: true,
+    useCase: 'vision'
   },
   'gemini-1.5-flash': {
     provider: 'gemini',
     model: 'gemini-1.5-flash',
     apiKey: process.env.GEMINI_API_KEY,
-    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models'
+    baseUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
+    supportsVision: false,
+    useCase: 'coding'
   },
   
-  // OpenRouter Models
-  'openrouter-2': {
+  // OpenRouter Free Models
+  'deepseek-r1t2-chimera': {
     provider: 'openrouter',
-    model: 'openai/gpt-4o-mini',
+    model: 'tngtech/deepseek-r1t2-chimera:free',
     apiKey: process.env.OPENROUTER_API_KEY,
-    baseUrl: 'https://openrouter.ai/api/v1'
+    baseUrl: 'https://openrouter.ai/api/v1',
+    supportsVision: false,
+    useCase: 'coding'
   },
-  
-  // Qwen Models
-  'qwen-coder': {
-    provider: 'qwen',
-    model: 'qwen/Qwen2.5-Coder-7B-Instruct',
-    apiKey: process.env.QWEN_API_KEY,
-    baseUrl: 'https://dashscope.aliyuncs.com/api/v1'
+  'qwen3-coder': {
+    provider: 'openrouter',
+    model: 'qwen/qwen3-coder:free',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseUrl: 'https://openrouter.ai/api/v1',
+    supportsVision: false,
+    useCase: 'coding'
   },
-  
-  // DeepSeek Models
-  'deepseek-tgn-r1t2': {
-    provider: 'deepseek',
-    model: 'deepseek-ai/deepseek-coder-33b-instruct',
-    apiKey: process.env.DEEPSEEK_API_KEY,
-    baseUrl: 'https://api.deepseek.com/v1'
+  'deepseek-r1-0528': {
+    provider: 'openrouter',
+    model: 'deepseek/deepseek-r1-0528:free',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseUrl: 'https://openrouter.ai/api/v1',
+    supportsVision: false,
+    useCase: 'coding'
+  },
+  'deepseek-r1-qwen3-8b': {
+    provider: 'openrouter',
+    model: 'deepseek/deepseek-r1-0528-qwen3-8b:free',
+    apiKey: process.env.OPENROUTER_API_KEY,
+    baseUrl: 'https://openrouter.ai/api/v1',
+    supportsVision: false,
+    useCase: 'coding'
   }
 };
 
@@ -62,7 +76,7 @@ export async function getAvailableModels() {
  * @returns {Object} AI response
  */
 export async function processAIRequest(params) {
-  const { prompt, model, context, files, temperature = 0.7, maxTokens = 4000 } = params;
+  const { prompt, model, context, files, temperature = 0.7, maxTokens = 4000, imageData = null } = params;
   
   if (!AI_MODELS[model]) {
     throw new Error(`Model ${model} not supported`);
@@ -74,16 +88,17 @@ export async function processAIRequest(params) {
     throw new Error(`API key not configured for model ${model}`);
   }
 
+  // Validate vision support
+  if (imageData && !modelConfig.supportsVision) {
+    throw new Error(`Model ${model} does not support vision capabilities`);
+  }
+
   try {
     switch (modelConfig.provider) {
       case 'gemini':
-        return await processGeminiRequest(modelConfig, prompt, context, files, temperature);
+        return await processGeminiRequest(modelConfig, prompt, context, files, temperature, imageData);
       case 'openrouter':
         return await processOpenRouterRequest(modelConfig, prompt, context, files, temperature, maxTokens);
-      case 'qwen':
-        return await processQwenRequest(modelConfig, prompt, context, files, temperature);
-      case 'deepseek':
-        return await processDeepSeekRequest(modelConfig, prompt, context, files, temperature, maxTokens);
       default:
         throw new Error(`Provider ${modelConfig.provider} not implemented`);
     }
@@ -96,7 +111,7 @@ export async function processAIRequest(params) {
 /**
  * Process Gemini request
  */
-async function processGeminiRequest(config, prompt, context, files, temperature) {
+async function processGeminiRequest(config, prompt, context, files, temperature, imageData = null) {
   const genAI = new GoogleGenerativeAI(config.apiKey);
   const model = genAI.getGenerativeModel({ 
     model: config.model,
@@ -120,7 +135,25 @@ async function processGeminiRequest(config, prompt, context, files, temperature)
     fullPrompt = `${fileContext}\n\n${fullPrompt}`;
   }
 
-  const result = await model.generateContent(fullPrompt);
+  let result;
+  
+  // Handle vision requests
+  if (imageData && config.supportsVision) {
+    // Convert base64 to Uint8Array for Gemini
+    const imageBytes = Buffer.from(imageData.split(',')[1], 'base64');
+    
+    const imagePart = {
+      inlineData: {
+        data: imageBytes.toString('base64'),
+        mimeType: 'image/jpeg' // Adjust based on actual image type
+      }
+    };
+    
+    result = await model.generateContent([fullPrompt, imagePart]);
+  } else {
+    result = await model.generateContent(fullPrompt);
+  }
+  
   const response = await result.response;
   
   return {

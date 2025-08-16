@@ -8,7 +8,9 @@ import {
   Trash2, 
   Download,
   Copy,
-  Sparkles
+  Sparkles,
+  Image,
+  Upload
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { aiAPI } from '@/services/api';
@@ -30,6 +32,8 @@ const ChatPanel: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [models, setModels] = useState<AIModel[]>([]);
   const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [isVisionMode, setIsVisionMode] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Load available models
@@ -51,11 +55,12 @@ const ChatPanel: React.FC = () => {
       console.error('Failed to load models:', error);
       // Fallback to default models
       setModels([
-        { id: 'gemini-2.0-pro', name: 'Gemini 2.0 Pro', provider: 'gemini', model: 'gemini-2.0-flash-exp', available: true },
-        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', provider: 'gemini', model: 'gemini-1.5-flash', available: true },
-        { id: 'openrouter-2', name: 'OpenRouter -2', provider: 'openrouter', model: 'openai/gpt-4o-mini', available: true },
-        { id: 'qwen-coder', name: 'Qwen Coder', provider: 'qwen', model: 'qwen/Qwen2.5-Coder-7B-Instruct', available: true },
-        { id: 'deepseek-tgn-r1t2', name: 'DeepSeek TGN R1T2', provider: 'deepseek', model: 'deepseek-ai/deepseek-coder-33b-instruct', available: true },
+        { id: 'gemini-2.0-pro', name: 'Gemini 2.0 Pro (Vision)', provider: 'gemini', model: 'gemini-2.0-flash-exp', available: true, supportsVision: true },
+        { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', provider: 'gemini', model: 'gemini-1.5-flash', available: true, supportsVision: false },
+        { id: 'deepseek-r1t2-chimera', name: 'DeepSeek R1T2 Chimera', provider: 'openrouter', model: 'tngtech/deepseek-r1t2-chimera:free', available: true, supportsVision: false },
+        { id: 'qwen3-coder', name: 'Qwen3 Coder', provider: 'openrouter', model: 'qwen/qwen3-coder:free', available: true, supportsVision: false },
+        { id: 'deepseek-r1-0528', name: 'DeepSeek R1 0528', provider: 'openrouter', model: 'deepseek/deepseek-r1-0528:free', available: true, supportsVision: false },
+        { id: 'deepseek-r1-qwen3-8b', name: 'DeepSeek R1 Qwen3 8B', provider: 'openrouter', model: 'deepseek/deepseek-r1-0528-qwen3-8b:free', available: true, supportsVision: false },
       ]);
     } finally {
       setIsLoadingModels(false);
@@ -98,6 +103,7 @@ const ChatPanel: React.FC = () => {
         files,
         temperature: chat.temperature,
         maxTokens: chat.maxTokens,
+        imageData: selectedImage, // Add image data for vision
       });
 
       // Add AI response
@@ -108,6 +114,10 @@ const ChatPanel: React.FC = () => {
         usage: response.usage,
       });
 
+      // Clear image after sending
+      setSelectedImage(null);
+      setIsVisionMode(false);
+
     } catch (error) {
       console.error('AI request error:', error);
       toast.error('Failed to get AI response');
@@ -117,6 +127,60 @@ const ChatPanel: React.FC = () => {
         role: 'assistant',
         content: 'Sorry, I encountered an error while processing your request. Please try again.',
       });
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setSelectedImage(result);
+        setIsVisionMode(true);
+        
+        // Auto-select vision model if available
+        const visionModel = models.find(m => m.supportsVision);
+        if (visionModel) {
+          setSelectedModel(visionModel.id);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleVisionAnalysis = async () => {
+    if (!selectedImage) return;
+
+    try {
+      setChatLoading(true);
+      
+      const response = await aiAPI.analyzeVision({
+        imageData: selectedImage,
+        prompt: 'Analyze this UI design and provide the HTML/CSS/JavaScript code to recreate it',
+        model: 'gemini-2.0-pro'
+      });
+
+      addMessage({
+        role: 'user',
+        content: 'Analyze this UI design and provide the code to recreate it',
+      });
+
+      addMessage({
+        role: 'assistant',
+        content: response.content,
+        model: response.model,
+        usage: response.usage,
+      });
+
+      setSelectedImage(null);
+      setIsVisionMode(false);
+
+    } catch (error) {
+      console.error('Vision analysis error:', error);
+      toast.error('Failed to analyze image');
     } finally {
       setChatLoading(false);
     }
@@ -177,19 +241,71 @@ const ChatPanel: React.FC = () => {
         {/* Model Selector */}
         <div className="space-y-2">
           <label className="block text-xs text-white/60">AI Model</label>
-          <select
-            value={chat.selectedModel}
-            onChange={(e) => setSelectedModel(e.target.value)}
-            className="input-dark w-full text-sm"
-            disabled={isLoadingModels}
-          >
-            {models.map((model) => (
-              <option key={model.id} value={model.id}>
-                {model.name} {!model.available && '(Unavailable)'}
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-2">
+            <select
+              value={chat.selectedModel}
+              onChange={(e) => setSelectedModel(e.target.value)}
+              className="input-dark flex-1 text-sm"
+              disabled={isLoadingModels}
+            >
+              {models.map((model) => (
+                <option key={model.id} value={model.id}>
+                  {model.name} {model.supportsVision && '(Vision)'} {!model.available && '(Unavailable)'}
+                </option>
+              ))}
+            </select>
+            
+            {/* Vision Upload Button */}
+            <label className="cursor-pointer">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <div className="p-2 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors" title="Upload UI Design">
+                <Image className="w-4 h-4 text-white" />
+              </div>
+            </label>
+          </div>
         </div>
+
+        {/* Vision Mode Indicator */}
+        {isVisionMode && selectedImage && (
+          <div className="mt-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+            <div className="flex items-center gap-2 mb-2">
+              <Image className="w-4 h-4 text-blue-400" />
+              <span className="text-sm font-medium text-blue-400">Vision Mode Active</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <img 
+                src={selectedImage} 
+                alt="Uploaded design" 
+                className="w-16 h-16 object-cover rounded border border-gray-600"
+              />
+              <div className="flex-1">
+                <p className="text-xs text-gray-400 mb-1">UI Design uploaded for analysis</p>
+                <button
+                  onClick={handleVisionAnalysis}
+                  disabled={chat.isLoading}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-xs text-white rounded transition-colors"
+                >
+                  {chat.isLoading ? 'Analyzing...' : 'Analyze Design'}
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedImage(null);
+                  setIsVisionMode(false);
+                }}
+                className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                title="Remove image"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Model Settings */}
         <div className="grid grid-cols-2 gap-2 mt-2">
