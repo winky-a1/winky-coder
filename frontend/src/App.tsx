@@ -5,6 +5,8 @@ import { importRepo, getRepoFiles, getFileContent as apiGetFile } from '@/servic
 import { updateFile as apiUpdateFile } from '@/services/files'
 import { v4 as uuidv4 } from 'uuid'
 import Editor from '@monaco-editor/react'
+import { Terminal } from './components/Terminal'
+import { ProjectTemplates } from './components/ProjectTemplates'
 
 function TopBar() {
   const theme = useAppStore(s => s.theme)
@@ -113,6 +115,8 @@ export default function App() {
   const editor = useEditor()
   const setCurrentFile = useAppStore(s => s.setCurrentFile)
   const setEditorDirty = useAppStore(s => s.setEditorDirty)
+  const [isTerminalOpen, setIsTerminalOpen] = useState(false)
+  const [isProjectTemplatesOpen, setIsProjectTemplatesOpen] = useState(false)
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
@@ -139,6 +143,16 @@ export default function App() {
     if (res.success) setCurrentRepository(res.data)
   }
 
+  const toggleTerminal = () => {
+    setIsTerminalOpen(!isTerminalOpen)
+  }
+
+  const handleCreateProject = (template: any) => {
+    // TODO: Implement project creation
+    console.log('Creating project with template:', template)
+    // This would create a new project with the selected template
+  }
+
   return (
     <div className="h-full grid" style={{ gridTemplateRows: 'auto 1fr', gridTemplateColumns: '260px 1fr 420px' }}>
       <div className="col-span-3"><TopBar /></div>
@@ -146,6 +160,8 @@ export default function App() {
       <div className="row-start-2 border-x border-slate-700 flex flex-col">
         <div className="p-2 flex gap-2">
           <button className="btn-primary" onClick={importExample}>Import Example Repo</button>
+          <button className="btn-secondary" onClick={() => setIsProjectTemplatesOpen(true)}>New Project</button>
+          <button className="btn-secondary" onClick={toggleTerminal}>Terminal</button>
           {editor.isDirty && <button className="btn-accent" onClick={saveFile}>Save</button>}
         </div>
         <div className="flex-1">
@@ -165,6 +181,20 @@ export default function App() {
         </div>
       </div>
       <div className="row-start-2"><ChatPanel /></div>
+      
+      {/* Terminal */}
+      <Terminal 
+        isOpen={isTerminalOpen} 
+        onToggle={toggleTerminal}
+        repoPath={useAppStore.getState().currentRepository?.path}
+      />
+      
+      {/* Project Templates */}
+      <ProjectTemplates
+        isOpen={isProjectTemplatesOpen}
+        onClose={() => setIsProjectTemplatesOpen(false)}
+        onCreateProject={handleCreateProject}
+      />
     </div>
   )
 }
