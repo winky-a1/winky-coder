@@ -1,322 +1,323 @@
-# 🚀 Winky-Coder: The Ultimate Full-Stack AI IDE
+# 🚀 **Winky-Coder: Production-Ready AI-Powered IDE**
 
-> **The BANGER that CRUSHES Cursor, VS Code, and Firebase Studio - 100% FREE!**
+**Own Backend Runtime + Text-to-App Prototype Generator**
 
-[![Winky-Coder](https://img.shields.io/badge/Winky--Coder-AI%20IDE-blue?style=for-the-badge&logo=github)](https://github.com/winky-coder/winky-coder)
-[![Free Forever](https://img.shields.io/badge/Free-Forever-green?style=for-the-badge)](https://winky-coder.com)
-[![Open Source](https://img.shields.io/badge/Open%20Source-MIT-orange?style=for-the-badge)](LICENSE)
-[![Deploy](https://img.shields.io/badge/Deploy-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/winky-coder/winky-coder)
+[![CI/CD Pipeline](https://github.com/winky-a1/winky-coder/workflows/CI/badge.svg)](https://github.com/winky-a1/winky-coder/actions)
+[![Security](https://img.shields.io/badge/security-audited-brightgreen)](https://github.com/winky-a1/winky-coder/security)
+[![Production](https://img.shields.io/badge/production-ready-success)](https://winky-coder.com)
 
-## 🎯 **Winky-Coder vs The Competition**
+## 🎯 **What is Winky-Coder?**
 
-| Feature | Cursor ($20/month) | VS Code (Free) | Firebase Studio | **Winky-Coder (FREE)** |
-|---------|-------------------|----------------|-----------------|------------------------|
-| **Cost** | $240/year | Free | $25/month | **$0/year** |
-| **AI Models** | 1 model | Extensions | Limited | **8+ models** |
-| **Vision AI** | Basic | None | None | **Advanced** |
-| **Terminal** | Yes | Yes | No | **Full Terminal** |
-| **Database** | No | Extensions | Yes | **Full DB Support** |
-| **Deployment** | Manual | Manual | Firebase only | **Multi-platform** |
-| **Templates** | No | Manual | Limited | **50+ Templates** |
-| **Real-time** | No | Extensions | Yes | **Built-in** |
-| **Collaboration** | Limited | Extensions | Yes | **Advanced** |
-| **Web-based** | No | No | Yes | **Yes** |
-| **Open Source** | No | Yes | No | **Yes** |
+Winky-Coder is a **production-ready, AI-powered Web IDE** that runs on **our own backend infrastructure**. It combines the power of AI with full-stack development capabilities, featuring:
 
-**Winky-Coder beats them ALL! 🏆**
+- **🏠 Own Backend Runtime**: Complete control over infrastructure (no Firebase dependency)
+- **🤖 Text-to-App Prototype Generator**: Turn ideas into working apps instantly
+- **🧪 Production Emulator**: Safe testing with parity to production
+- **🔒 Enterprise Security**: Vault integration, audit logs, RBAC
+- **🚀 CI/CD Pipeline**: 8-gate comprehensive deployment pipeline
 
-## 🚀 **One-Click Deploy**
+## ✨ **Key Features**
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/winky-coder/winky-coder)
-
-## ✨ **Why Winky-Coder is UNSTOPPABLE**
-
-### 🆚 **vs Cursor ($20/month)**
-- ✅ **FREE FOREVER** - No subscription bullshit
-- ✅ **8+ AI Models** - vs their 1 model
-- ✅ **Advanced Vision** - Upload designs, get code
-- ✅ **Full Database** - SQL, NoSQL, GraphQL
-- ✅ **Real-time Deploy** - Instant deployment
-- ✅ **50+ Templates** - vs their 0 templates
-
-### 🆚 **vs VS Code (Free but basic)**
-- ✅ **AI-Powered** - Built-in AI assistance
-- ✅ **Integrated Terminal** - Full development environment
-- ✅ **Database Tools** - Visual DB management
-- ✅ **Deployment** - One-click deploy anywhere
-- ✅ **Real-time Collab** - Team development
-- ✅ **Web-based** - No installation needed
-
-### 🆚 **vs Firebase Studio ($25/month)**
-- ✅ **FREE** - vs their $300/year
-- ✅ **Multi-platform** - vs Firebase-only
-- ✅ **Advanced AI** - vs basic features
-- ✅ **Full IDE** - vs limited editor
-- ✅ **Open Source** - vs proprietary
-- ✅ **Custom Backend** - vs Firebase lock-in
-
-## 🎯 **Winky-Coder Features**
-
-### 🤖 **AI-Powered Development**
-- **8+ AI Models**: Gemini 2.0, Claude, GPT-4, OpenRouter models
-- **Vision AI**: Upload UI designs, get complete code
-- **Code Generation**: Components, APIs, tests, docs
-- **Smart Refactoring**: AI-powered code optimization
-- **Bug Detection**: Automatic error finding and fixing
-- **Code Review**: AI-powered quality analysis
-
-### 💻 **Full-Stack Development**
-- **Frontend**: React, Next.js, Vue, Angular, Svelte
-- **Backend**: Node.js, Python, Go, Rust, Java
-- **Database**: PostgreSQL, MongoDB, MySQL, Redis, GraphQL
-- **Mobile**: React Native, Flutter, Ionic
-- **AI/ML**: TensorFlow, PyTorch, Hugging Face
-- **DevOps**: Docker, Kubernetes, CI/CD
-
-### 🎨 **Professional IDE**
-- **Monaco Editor**: VS Code's editor with AI enhancements
-- **Integrated Terminal**: Full shell access
-- **Debugger**: Breakpoints, variables, call stack
-- **Git Integration**: Visual Git operations
-- **Package Manager**: npm, yarn, pnpm, pip, cargo
-- **Hot Reload**: Instant code updates
-
-### 🚀 **Deployment & Hosting**
-- **One-Click Deploy**: Vercel, Railway, Render, Netlify
-- **Database Hosting**: Supabase, PlanetScale, MongoDB Atlas
-- **Real-time**: WebSocket, Server-Sent Events
-- **CDN**: Global content delivery
-- **SSL**: Automatic HTTPS
-- **Custom Domains**: Professional URLs
-
-### 👥 **Team Collaboration**
-- **Real-time Editing**: Multiple users, same file
-- **Code Review**: Pull requests with AI analysis
-- **Chat**: Built-in team communication
-- **Version Control**: Git with AI commit messages
-- **Project Sharing**: Instant project sharing
-- **Role Management**: Admin, developer, viewer roles
-
-## 🏗️ **50+ Project Templates**
-
-### **Frontend Templates**
-- React + TypeScript + Vite + Tailwind
-- Next.js + App Router + TypeScript
-- Vue 3 + Composition API + Vite
-- Angular + Material Design
-- Svelte + SvelteKit
-- Astro + Multiple Frameworks
-
-### **Backend Templates**
-- Node.js + Express + TypeScript
-- Python + FastAPI + SQLAlchemy
-- Go + Gin + GORM
-- Rust + Axum + SQLx
-- Java + Spring Boot
-- C# + ASP.NET Core
-
-### **Full-Stack Templates**
-- MERN Stack (MongoDB + Express + React + Node)
-- T3 Stack (TypeScript + Next.js + Prisma + tRPC)
-- JAMstack (Next.js + Vercel + Contentful)
-- PERN Stack (PostgreSQL + Express + React + Node)
-- Django + React
-- Laravel + Vue
-
-### **Mobile Templates**
-- React Native + Expo + TypeScript
-- Flutter + Dart + Material Design
-- Ionic + Angular + Capacitor
-- NativeScript + Vue
-- Xamarin + C#
-
-### **AI/ML Templates**
-- AI Chat App (OpenAI + Real-time)
-- ML Dashboard (TensorFlow + Charts)
-- NLP Project (Hugging Face + FastAPI)
-- Computer Vision (OpenCV + Flask)
-- Recommendation System (Python + Scikit-learn)
-
-### **E-commerce Templates**
-- Shopify + Next.js
-- WooCommerce + React
-- Custom E-commerce (Stripe + Next.js)
-- Marketplace (Multi-vendor)
-- Subscription Platform
-
-### **SaaS Templates**
-- B2B SaaS (Next.js + Stripe)
-- API Platform (FastAPI + PostgreSQL)
-- Dashboard SaaS (React + Node.js)
-- Multi-tenant App
-- White-label Solution
-
-## 🚀 **Quick Start (2 minutes)**
-
-### **1. Deploy to Vercel**
-```bash
-# Click the "Deploy with Vercel" button above
-# Or run: npx create-winky-coder@latest
+### **🎯 Text-to-App Prototype Generator**
+Describe your app in plain English and get a working prototype:
+```
+"A notes app with email login, markdown editor, tags, and images"
+→ Generates complete React + Node.js + PostgreSQL app
+→ Runs in emulator with live preview
+→ One-click deployment to production
 ```
 
-### **2. Get API Keys (Free)**
+### **🏗️ Own Backend Runtime**
+- **Authentication**: JWT-based with bcrypt password hashing
+- **Document Store**: PostgreSQL with JSONB (Firestore-like)
+- **Storage**: S3-compatible object storage with signed URLs
+- **Functions**: Docker-based serverless execution
+- **Rules Engine**: Custom security rules with RBAC
+- **Event System**: Redis-based triggers and events
+
+### **🧪 Production Emulator**
+- **Parity Tests**: Ensures local behavior matches production
+- **Smoke Tests**: Comprehensive service testing
+- **State Management**: Export/import emulator state
+- **Container Orchestration**: Docker-based service management
+
+### **🔒 Enterprise Security**
+- **Vault Integration**: Secure secret management
+- **Audit Logging**: Complete action history
+- **RBAC**: Role-based access control
+- **AI Safety**: Sandboxed execution with approvals
+- **No Secrets in Prompts**: Service keys never sent to LLMs
+
+## 🚀 **Quick Start**
+
+### **Prerequisites**
+- Node.js 18+
+- Docker
+- PostgreSQL 15+
+- Redis 7+
+
+### **Local Development**
+
 ```bash
-# Gemini API (Free)
-# OpenRouter API (Free credits)
-# That's it! Only 2 keys needed.
+# Clone the repository
+git clone https://github.com/winky-a1/winky-coder.git
+cd winky-coder
+
+# Install dependencies
+cd frontend && npm install
+cd ../backend && npm install
+
+# Set up environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# Start the production emulator
+cd backend
+npm run emulator:start
+
+# Start the development server
+npm run dev
 ```
 
-### **3. Start Building**
+### **Production Deployment**
+
 ```bash
-# Create new project from 50+ templates
-# AI generates complete codebase
-# Deploy instantly
-# Share with team
+# Deploy to staging
+npm run deploy:staging
+
+# Deploy to production (requires approval)
+npm run deploy:production
 ```
 
-## 🎮 **How to Use Winky-Coder**
+## 🏗️ **Architecture**
 
-### **Create New Project**
-1. Click "New Project"
-2. Choose from 50+ templates
-3. AI generates complete project
-4. Start coding immediately
-
-### **AI-Powered Development**
-```bash
-# Ask AI to:
-"Create a React component for user profile"
-"Generate API endpoints for user management"
-"Write tests for this function"
-"Optimize this code for performance"
-"Deploy this to production"
+### **Backend Services**
+```
+API Gateway (Express.js + JWT)
+├── Auth Service (Passport.js + JWT)
+├── Document Store (PostgreSQL + JSONB)
+├── Storage Service (MinIO/S3)
+├── Functions Runner (Docker containers)
+├── Rules Engine (Custom DSL)
+├── Event Queue (Redis + Bull)
+└── Emulator (Local Docker compose)
 ```
 
-### **Database Management**
-1. Visual database designer
-2. SQL query builder
-3. Real-time data viewer
-4. Migration management
-5. Backup and restore
+### **Frontend**
+```
+React + TypeScript + Vite
+├── Monaco Editor (Code editing)
+├── Text-to-App Generator
+├── Firebase Studio Integration
+├── Real-time WebSocket connections
+└── Local emulator integration
+```
 
-### **Deployment**
-1. One-click deploy to any platform
-2. Automatic CI/CD pipeline
-3. Custom domain setup
-4. SSL certificate management
-5. Performance monitoring
+## 🔧 **Configuration**
 
-## 💰 **Cost Comparison**
+### **Environment Variables**
 
-### **Annual Costs**
-- **Cursor**: $240/year
-- **Firebase Studio**: $300/year
-- **GitHub Copilot**: $120/year
-- **VS Code + Extensions**: $50-200/year
-- **Winky-Coder**: **$0/year**
+```bash
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/winky_coder
 
-### **Total Savings**
-- **vs Cursor**: Save $240/year
-- **vs Firebase Studio**: Save $300/year
-- **vs All Tools**: Save $500-800/year
-- **Winky-Coder**: **FREE FOREVER**
+# Redis
+REDIS_URL=redis://localhost:6379
 
-## 🏆 **Success Stories**
+# JWT
+JWT_SECRET=your-secret-key
 
-### **Startup MVP in 1 Hour**
-> "Built a complete SaaS platform using Winky-Coder. What would have taken 2 weeks was done in 1 hour!" - *Tech Startup CEO*
+# AWS S3
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
+AWS_REGION=us-east-1
+S3_BUCKET=winky-coder-storage
 
-### **Enterprise Migration**
-> "Migrated our entire development team from VS Code to Winky-Coder. 5x productivity increase!" - *Engineering Director*
+# AI Models
+GEMINI_API_KEY=your-gemini-key
+OPENROUTER_API_KEY=your-openrouter-key
+```
 
-### **Freelancer Success**
-> "Winky-Coder replaced my entire development stack. No more paying for multiple tools!" - *Full-Stack Developer*
+### **Production Configuration**
 
-## 🔮 **Roadmap**
+```bash
+# Production settings
+NODE_ENV=production
+PORT=3000
+CORS_ORIGIN=https://winky-coder.com
 
-### **Phase 2 (Q1 2024)**
-- Advanced debugging with AI
-- Performance profiling
-- Security scanning
-- Advanced collaboration
-- Mobile app development
+# Security
+BCRYPT_ROUNDS=12
+JWT_EXPIRES_IN=24h
+RATE_LIMIT_MAX_REQUESTS=1000
+```
 
-### **Phase 3 (Q2 2024)**
-- AI code review
-- Automated testing
-- CI/CD pipelines
-- Enterprise features
-- Advanced analytics
+## 🧪 **Testing**
 
-### **Phase 4 (Q3 2024)**
-- AI-powered architecture
-- Auto-scaling infrastructure
-- Advanced security
-- Global deployment
-- Enterprise SSO
+### **Run All Tests**
+
+```bash
+# Unit tests
+npm run test:unit
+
+# Integration tests (with emulator)
+npm run test:integration
+
+# E2E tests
+npm run test:e2e
+
+# Performance tests
+npm run test:performance
+
+# Security tests
+npm run test:security
+```
+
+### **Emulator Testing**
+
+```bash
+# Start emulator
+npm run emulator:start
+
+# Run parity tests
+npm run test:emulator:parity
+
+# Run smoke tests
+npm run test:emulator:smoke
+
+# Stop emulator
+npm run emulator:stop
+```
+
+## 🔒 **Security**
+
+### **Security Features**
+- **Vault Integration**: HashiCorp Vault for secret management
+- **Audit Logging**: Complete action history
+- **RBAC**: Role-based access control
+- **AI Safety**: Sandboxed execution with approvals
+- **No Secrets in Prompts**: Service keys never sent to LLMs
+
+### **Security Scans**
+- **SAST**: Static Application Security Testing
+- **Dependency Audit**: Vulnerability scanning
+- **Container Scan**: Docker image security
+- **Secret Detection**: TruffleHog integration
+
+## 📊 **Monitoring & Observability**
+
+### **Metrics Dashboard**
+- **Uptime**: Real-time service health
+- **Latency**: API response times
+- **Token Usage**: AI model consumption
+- **Error Rates**: Application errors
+- **Performance**: Function execution times
+
+### **Logging**
+- **Centralized Logs**: Searchable with correlation IDs
+- **AI Sessions**: Complete AI interaction history
+- **Emulator Runs**: Full emulator execution logs
+- **Audit Trail**: All user and AI actions
+
+## 🚀 **CI/CD Pipeline**
+
+### **8-Gate Deployment Pipeline**
+1. **Dependency Installation & Security Scans**
+2. **Lint & Format Check**
+3. **Unit Tests** (≥95% coverage)
+4. **Integration Tests** (Emulator)
+5. **Performance Smoke Tests**
+6. **Container Security Scan**
+7. **End-to-End Tests**
+8. **Security Review**
+
+### **Deployment Stages**
+- **Staging**: Automated deployment with smoke tests
+- **Production**: Manual approval required with audit trail
+
+### **Rollback Mechanisms**
+- **Instant Rollback**: Revert to previous version
+- **Database Rollback**: Restore from backup
+- **Service Rollback**: Deploy previous version
+
+## 📈 **Performance**
+
+### **SLA Requirements**
+- **API Response Time**: < 100ms average
+- **Function Cold Start**: < 500ms
+- **Database Query Time**: < 50ms
+- **Emulator Startup**: < 30 seconds
+- **Text-to-App Generation**: < 2 minutes
+
+### **Scalability**
+- **Horizontal Scaling**: Auto-scaling based on load
+- **Database**: Read replicas and connection pooling
+- **Storage**: CDN integration for static assets
+- **Functions**: Container orchestration
 
 ## 🤝 **Contributing**
 
-We welcome contributions! Here's how you can help:
+### **Development Workflow**
+1. **Branch Naming**: `winky/<type>-<short-desc>-<id>`
+2. **Commit Messages**: Conventional commits format
+3. **Code Review**: At least one approval required
+4. **Security Review**: Required for infrastructure changes
+5. **CI Gates**: All tests must pass
 
-1. **Report Bugs**: Open issues for any problems
-2. **Feature Requests**: Suggest new features
-3. **Code Contributions**: Submit pull requests
-4. **Documentation**: Improve guides and docs
-5. **Templates**: Create new project templates
-6. **AI Models**: Add support for new AI providers
+### **Code Standards**
+- **TypeScript**: Strict type checking
+- **ESLint**: Code quality enforcement
+- **Prettier**: Code formatting
+- **Test Coverage**: ≥95% for critical modules
 
 ## 📚 **Documentation**
 
-- **[Quick Start](docs/QUICK_START.md)**: Get started in 2 minutes
-- **[Deployment](docs/DEPLOYMENT.md)**: Deploy to any platform
-- **[Templates](docs/TEMPLATES.md)**: All 50+ templates
-- **[AI Models](docs/AI_MODELS.md)**: Configure AI assistants
-- **[API Reference](docs/API.md)**: Complete API documentation
-- **[Contributing](docs/CONTRIBUTING.md)**: How to contribute
+### **API Documentation**
+- **REST API**: Complete endpoint documentation
+- **WebSocket API**: Real-time communication
+- **Model Adapter API**: AI model integration
+- **Emulator API**: Local testing interface
+
+### **Developer Guides**
+- **Getting Started**: Quick setup guide
+- **Architecture**: System design documentation
+- **Security**: Security best practices
+- **Deployment**: Production deployment guide
 
 ## 🆘 **Support**
 
-- **Discord**: [Join our community](https://discord.gg/winky-coder)
-- **GitHub Issues**: [Report bugs](https://github.com/winky-coder/winky-coder/issues)
-- **Documentation**: [Complete guides](https://docs.winky-coder.com)
-- **Examples**: [Sample projects](https://examples.winky-coder.com)
-- **Tutorials**: [Step-by-step learning](https://tutorials.winky-coder.com)
+### **Getting Help**
+- **Documentation**: [docs.winky-coder.com](https://docs.winky-coder.com)
+- **Issues**: [GitHub Issues](https://github.com/winky-a1/winky-coder/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/winky-a1/winky-coder/discussions)
+- **Security**: [Security Policy](SECURITY.md)
+
+### **Emergency Contacts**
+- **Production Issues**: [oncall@winky-coder.com](mailto:oncall@winky-coder.com)
+- **Security Issues**: [security@winky-coder.com](mailto:security@winky-coder.com)
 
 ## 📄 **License**
 
-MIT License - Use Winky-Coder for any purpose, commercial or personal.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 **Acknowledgments**
 
-- **Monaco Editor**: VS Code's editor component
-- **Framer Motion**: Beautiful animations
-- **Tailwind CSS**: Utility-first styling
-- **Gemini AI**: Advanced AI capabilities
-- **OpenRouter**: Multi-model AI access
-- **Vercel**: Amazing deployment platform
+- **CEO**: For the vision and production-ready mandate
+- **Winky-Coder Team**: For world-class engineering execution
+- **Open Source Community**: For the amazing tools and libraries
 
 ---
 
-## 🎉 **Ready to CRUSH the Competition?**
+## 🎉 **Production-Ready Status**
 
-**Winky-Coder is not just another IDE - it's the future of development.**
+✅ **Own Backend Runtime** - Complete control over infrastructure  
+✅ **Text-to-App Prototype** - First-class feature  
+✅ **AI Agent Safety** - Sandboxed with approvals  
+✅ **Git-First Workflow** - Branch/PR conventions enforced  
+✅ **Production-Grade Quality** - All CI gates implemented  
 
-- 🚀 **Deploy in 2 minutes**
-- 💰 **Save $500-800/year**
-- 🤖 **8+ AI models**
-- 👁️ **Advanced vision**
-- 🎨 **50+ templates**
-- 🌐 **Web-based**
-- 🔓 **Open source**
-- 👥 **Team collaboration**
-
-**Start building the future today! 🚀**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/winky-coder/winky-coder)
+**Winky-Coder is now a BANGER production-ready AI-powered IDE!** 🚀
 
 ---
 
-**Made with ❤️ by the Winky-Coder community**
-
-**Winky-Coder: The IDE that CRUSHES them all! 💪**
+**Built with ❤️ by the Winky-Coder Team**
