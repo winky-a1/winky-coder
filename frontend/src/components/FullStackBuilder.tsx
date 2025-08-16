@@ -40,8 +40,8 @@ import {
   ArrowRight,
   Plus,
   X,
-  Clock,
-  ArrowLeft
+  Clock as ClockIcon,
+  ArrowLeft as ArrowLeftIcon
 } from 'lucide-react';
 
 interface AppTemplate {
@@ -493,10 +493,10 @@ export const FullStackBuilder: React.FC<FullStackBuilderProps> = ({
                       <p className="text-slate-400 text-sm mb-4">{template.description}</p>
                       
                       <div className="space-y-3">
-                        <div className="flex items-center gap-2 text-sm text-slate-400">
-                          <Clock className="w-4 h-4" />
-                          {template.estimatedTime}
-                        </div>
+                                                 <div className="flex items-center gap-2 text-sm text-slate-400">
+                           <ClockIcon className="w-4 h-4" />
+                           {template.estimatedTime}
+                         </div>
                         
                         <div className="flex flex-wrap gap-1">
                           {template.techStack.frontend.slice(0, 3).map((tech, index) => (
@@ -532,12 +532,12 @@ export const FullStackBuilder: React.FC<FullStackBuilderProps> = ({
             <div className="h-full flex flex-col">
               <div className="p-6 border-b border-slate-700">
                 <div className="flex items-center gap-3 mb-4">
-                  <button
-                    onClick={() => setBuildStep('select')}
-                    className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                  >
-                    <ArrowLeft className="w-5 h-5 text-slate-400" />
-                  </button>
+                                     <button
+                     onClick={() => setBuildStep('select')}
+                     className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+                   >
+                     <ArrowLeftIcon className="w-5 h-5 text-slate-400" />
+                   </button>
                   <h3 className="text-lg font-semibold text-white">Configure {selectedTemplate.name}</h3>
                 </div>
               </div>
