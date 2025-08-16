@@ -10,7 +10,12 @@ import {
   Copy,
   Sparkles,
   Image,
-  Upload
+  Upload,
+  Link,
+  GitBranch,
+  ChevronDown,
+  X,
+  Paperclip
 } from 'lucide-react';
 import { useAppStore } from '@/stores/appStore';
 import { aiAPI } from '@/services/api';
@@ -34,7 +39,25 @@ const ChatPanel: React.FC = () => {
   const [isLoadingModels, setIsLoadingModels] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [isVisionMode, setIsVisionMode] = useState(false);
+  const [showModelDropdown, setShowModelDropdown] = useState(false);
+  const [attachedLink, setAttachedLink] = useState<string>('');
+  const [showLinkInput, setShowLinkInput] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const modelDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (modelDropdownRef.current && !modelDropdownRef.current.contains(event.target as Node)) {
+        setShowModelDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Load available models
   useEffect(() => {
@@ -193,6 +216,15 @@ const ChatPanel: React.FC = () => {
     }
   };
 
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+    
+    // Auto-resize textarea
+    const textarea = e.target;
+    textarea.style.height = 'auto';
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+  };
+
   const copyMessage = (content: string) => {
     navigator.clipboard.writeText(content);
     toast.success('Message copied to clipboard');
@@ -213,82 +245,101 @@ const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-slate-800">
-      {/* Header */}
-      <div className="p-4 border-b border-white/10">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Bot className="w-5 h-5 text-accent-400" />
-            <h2 className="text-lg font-semibold text-white">AI Assistant</h2>
+    <div className="h-full flex flex-col bg-[#0d1117] border-l border-[#30363d]">
+      {/* Header - Cursor Style */}
+      <div className="px-4 py-3 border-b border-[#30363d] bg-[#161b22]">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div>
+              <h2 className="text-sm font-semibold text-white">AI Assistant</h2>
+              <p className="text-xs text-[#8b949e]">Powered by multiple AI models</p>
+            </div>
           </div>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-1">
             <button
               onClick={clearChat}
-              className="p-1 hover:bg-white/10 rounded transition-colors"
+              className="p-2 hover:bg-[#21262d] rounded-md transition-colors group"
               title="Clear Chat"
             >
-              <Trash2 className="w-4 h-4 text-white/60" />
+              <Trash2 className="w-4 h-4 text-[#8b949e] group-hover:text-white" />
             </button>
             <button
-              className="p-1 hover:bg-white/10 rounded transition-colors"
+              className="p-2 hover:bg-[#21262d] rounded-md transition-colors group"
               title="Settings"
             >
-              <Settings className="w-4 h-4 text-white/60" />
+              <Settings className="w-4 h-4 text-[#8b949e] group-hover:text-white" />
             </button>
           </div>
         </div>
 
-        {/* Model Selector */}
-        <div className="space-y-2">
-          <label className="block text-xs text-white/60">AI Model</label>
-          <div className="flex gap-2">
-            <select
-              value={chat.selectedModel}
-              onChange={(e) => setSelectedModel(e.target.value)}
-              className="input-dark flex-1 text-sm"
-              disabled={isLoadingModels}
-            >
+        {/* Model Selector - Cursor Style */}
+        <div className="relative" ref={modelDropdownRef}>
+          <button
+            onClick={() => setShowModelDropdown(!showModelDropdown)}
+            className="w-full flex items-center justify-between px-3 py-2 bg-[#21262d] border border-[#30363d] rounded-md hover:bg-[#30363d] transition-colors text-sm text-white"
+            disabled={isLoadingModels}
+          >
+            <div className="flex items-center space-x-2">
+              <Sparkles className="w-4 h-4 text-blue-400" />
+              <span>{models.find(m => m.id === chat.selectedModel)?.name || 'Select Model'}</span>
+              {models.find(m => m.id === chat.selectedModel)?.supportsVision && (
+                <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">Vision</span>
+              )}
+            </div>
+            <ChevronDown className={`w-4 h-4 text-[#8b949e] transition-transform ${showModelDropdown ? 'rotate-180' : ''}`} />
+          </button>
+          
+          {/* Model Dropdown */}
+          {showModelDropdown && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[#21262d] border border-[#30363d] rounded-md shadow-lg z-10 max-h-60 overflow-y-auto">
               {models.map((model) => (
-                <option key={model.id} value={model.id}>
-                  {model.name} {model.supportsVision && '(Vision)'} {!model.available && '(Unavailable)'}
-                </option>
+                <button
+                  key={model.id}
+                  onClick={() => {
+                    setSelectedModel(model.id);
+                    setShowModelDropdown(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm hover:bg-[#30363d] transition-colors ${
+                    chat.selectedModel === model.id ? 'bg-[#30363d] text-white' : 'text-[#c9d1d9]'
+                  }`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <span>{model.name}</span>
+                    {model.supportsVision && (
+                      <span className="px-1.5 py-0.5 bg-blue-500/20 text-blue-400 text-xs rounded">Vision</span>
+                    )}
+                  </div>
+                  {!model.available && (
+                    <span className="text-xs text-[#8b949e]">Unavailable</span>
+                  )}
+                </button>
               ))}
-            </select>
-            
-            {/* Vision Upload Button */}
-            <label className="cursor-pointer">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              <div className="p-2 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors" title="Upload UI Design">
-                <Image className="w-4 h-4 text-white" />
-              </div>
-            </label>
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Vision Mode Indicator */}
+        {/* Vision Mode Indicator - Cursor Style */}
         {isVisionMode && selectedImage && (
-          <div className="mt-3 p-3 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+          <div className="mt-3 p-3 bg-[#0c2d6b] border border-[#1f6feb] rounded-md">
             <div className="flex items-center gap-2 mb-2">
-              <Image className="w-4 h-4 text-blue-400" />
-              <span className="text-sm font-medium text-blue-400">Vision Mode Active</span>
+              <Image className="w-4 h-4 text-[#1f6feb]" />
+              <span className="text-sm font-medium text-[#1f6feb]">Vision Mode Active</span>
             </div>
             <div className="flex items-center gap-3">
               <img 
                 src={selectedImage} 
                 alt="Uploaded design" 
-                className="w-16 h-16 object-cover rounded border border-gray-600"
+                className="w-16 h-16 object-cover rounded border border-[#30363d]"
               />
               <div className="flex-1">
-                <p className="text-xs text-gray-400 mb-1">UI Design uploaded for analysis</p>
+                <p className="text-xs text-[#8b949e] mb-1">UI Design uploaded for analysis</p>
                 <button
                   onClick={handleVisionAnalysis}
                   disabled={chat.isLoading}
-                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 text-xs text-white rounded transition-colors"
+                  className="px-3 py-1 bg-[#1f6feb] hover:bg-[#388bfd] disabled:bg-[#21262d] text-xs text-white rounded transition-colors"
                 >
                   {chat.isLoading ? 'Analyzing...' : 'Analyze Design'}
                 </button>
@@ -298,32 +349,34 @@ const ChatPanel: React.FC = () => {
                   setSelectedImage(null);
                   setIsVisionMode(false);
                 }}
-                className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                className="p-1 text-[#8b949e] hover:text-red-400 transition-colors"
                 title="Remove image"
               >
-                <Trash2 className="w-4 h-4" />
+                <X className="w-4 h-4" />
               </button>
             </div>
           </div>
         )}
 
-        {/* Model Settings */}
-        <div className="grid grid-cols-2 gap-2 mt-2">
+        {/* Model Settings - Cursor Style */}
+        <div className="grid grid-cols-2 gap-3 mt-3">
           <div>
-            <label className="block text-xs text-white/60">Temperature</label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.1"
-              value={chat.temperature}
-              onChange={(e) => setChatTemperature(parseFloat(e.target.value))}
-              className="w-full"
-            />
-            <span className="text-xs text-white/40">{chat.temperature}</span>
+            <label className="block text-xs text-[#8b949e] mb-1">Temperature</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.1"
+                value={chat.temperature}
+                onChange={(e) => setChatTemperature(parseFloat(e.target.value))}
+                className="flex-1 h-1.5 bg-[#30363d] rounded-lg appearance-none cursor-pointer slider"
+              />
+              <span className="text-xs text-[#c9d1d9] w-8 text-right">{chat.temperature}</span>
+            </div>
           </div>
           <div>
-            <label className="block text-xs text-white/60">Max Tokens</label>
+            <label className="block text-xs text-[#8b949e] mb-1">Max Tokens</label>
             <input
               type="number"
               min="100"
@@ -331,14 +384,14 @@ const ChatPanel: React.FC = () => {
               step="100"
               value={chat.maxTokens}
               onChange={(e) => setChatMaxTokens(parseInt(e.target.value))}
-              className="input-dark w-full text-xs"
+              className="w-full px-2 py-1 bg-[#21262d] border border-[#30363d] rounded text-xs text-white focus:outline-none focus:border-[#1f6feb]"
             />
           </div>
         </div>
       </div>
 
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto scrollbar-thin p-4 space-y-4">
+      {/* Messages - Cursor Style */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-6">
         <AnimatePresence>
           {chat.messages.map((message) => (
             <motion.div
@@ -346,66 +399,76 @@ const ChatPanel: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className={`chat-message ${message.role}`}
+              className={`flex items-start space-x-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
-              <div className="flex items-start space-x-3">
-                <div className="flex-shrink-0">
-                  {message.role === 'user' ? (
-                    <User className="w-6 h-6 text-primary-400" />
-                  ) : (
-                    <Bot className="w-6 h-6 text-accent-400" />
-                  )}
+              {message.role === 'assistant' && (
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-4 h-4 text-white" />
                 </div>
-                
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-white/80">
-                      {message.role === 'user' ? 'You' : 'AI Assistant'}
-                    </span>
-                    <div className="flex items-center space-x-1">
-                      {message.usage && (
-                        <span className="text-xs text-white/40">
-                          {message.usage.totalTokens} tokens
-                        </span>
-                      )}
-                      <button
-                        onClick={() => copyMessage(message.content)}
-                        className="p-1 hover:bg-white/10 rounded transition-colors"
-                        title="Copy message"
-                      >
-                        <Copy className="w-3 h-3 text-white/60" />
-                      </button>
+              )}
+              <div className={`flex-1 max-w-[85%] ${message.role === 'user' ? 'order-first' : ''}`}>
+                {message.role === 'user' ? (
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-6 h-6 bg-[#21262d] rounded-full flex items-center justify-center">
+                      <User className="w-3 h-3 text-[#8b949e]" />
                     </div>
+                    <span className="text-sm font-medium text-[#c9d1d9]">You</span>
                   </div>
-                  
-                  <div 
-                    className="text-sm text-white/90 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
-                  />
-                  
-                  {message.model && (
-                    <div className="mt-2 text-xs text-white/40">
-                      Model: {message.model}
+                ) : (
+                  <div className="flex items-center space-x-2 mb-2">
+                    <span className="text-sm font-medium text-[#c9d1d9]">AI Assistant</span>
+                    {message.model && (
+                      <span className="text-xs text-[#8b949e] bg-[#21262d] px-2 py-0.5 rounded">({message.model})</span>
+                    )}
+                  </div>
+                )}
+                <div 
+                  className={`p-3 rounded-lg text-sm leading-relaxed ${
+                    message.role === 'user' 
+                      ? 'bg-[#1f6feb] text-white' 
+                      : 'bg-[#21262d] text-[#c9d1d9] border border-[#30363d]'
+                  }`}
+                  dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  {message.usage && (
+                    <div className="text-xs text-[#8b949e] flex items-center space-x-4">
+                      <span>Tokens: {message.usage.totalTokens}</span>
+                      <span>Cost: ~${((message.usage.totalTokens / 1000) * 0.002).toFixed(4)}</span>
                     </div>
                   )}
+                  <button
+                    onClick={() => copyMessage(message.content)}
+                    className="p-1 hover:bg-[#30363d] rounded transition-colors"
+                    title="Copy message"
+                  >
+                    <Copy className="w-3 h-3 text-[#8b949e] hover:text-white" />
+                  </button>
                 </div>
               </div>
             </motion.div>
           ))}
         </AnimatePresence>
 
-        {/* Loading indicator */}
+        {/* Loading indicator - Cursor Style */}
         {chat.isLoading && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="chat-message assistant"
+            className="flex items-start space-x-4"
           >
-            <div className="flex items-start space-x-3">
-              <Bot className="w-6 h-6 text-accent-400" />
-              <div className="flex items-center space-x-2">
-                <div className="loading-spinner"></div>
-                <span className="text-sm text-white/60">AI is thinking...</span>
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Bot className="w-4 h-4 text-white" />
+            </div>
+            <div className="flex-1 max-w-[85%]">
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="text-sm font-medium text-[#c9d1d9]">AI Assistant</span>
+              </div>
+              <div className="p-3 bg-[#21262d] border border-[#30363d] rounded-lg">
+                <div className="flex items-center space-x-2">
+                  <div className="w-4 h-4 border-2 border-[#1f6feb] border-t-transparent rounded-full animate-spin"></div>
+                  <span className="text-sm text-[#8b949e]">AI is thinking...</span>
+                </div>
               </div>
             </div>
           </motion.div>
@@ -414,29 +477,131 @@ const ChatPanel: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input */}
-      <div className="p-4 border-t border-white/10">
-        <div className="flex space-x-2">
-          <textarea
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask AI to help with your code..."
-            className="chat-input flex-1 resize-none"
-            rows={3}
-            disabled={chat.isLoading}
-          />
-          <button
-            onClick={handleSendMessage}
-            disabled={!inputValue.trim() || chat.isLoading}
-            className="btn-accent px-4 py-2 self-end"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+      {/* ChatGPT-style Input */}
+      <div className="p-4 border-t border-[#30363d] bg-[#0d1117]">
+        {/* Attachments */}
+        {(selectedImage || attachedLink) && (
+          <div className="mb-3 p-3 bg-[#21262d] border border-[#30363d] rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-[#c9d1d9]">Attachments</span>
+              <button
+                onClick={() => {
+                  setSelectedImage(null);
+                  setAttachedLink('');
+                  setIsVisionMode(false);
+                  setShowLinkInput(false);
+                }}
+                className="p-1 hover:bg-[#30363d] rounded transition-colors"
+              >
+                <X className="w-4 h-4 text-[#8b949e]" />
+              </button>
+            </div>
+            <div className="space-y-2">
+              {selectedImage && (
+                <div className="flex items-center space-x-2">
+                  <Image className="w-4 h-4 text-[#1f6feb]" />
+                  <span className="text-sm text-[#8b949e]">Image uploaded</span>
+                </div>
+              )}
+              {attachedLink && (
+                <div className="flex items-center space-x-2">
+                  <Link className="w-4 h-4 text-[#1f6feb]" />
+                  <span className="text-sm text-[#8b949e] truncate">{attachedLink}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Link Input */}
+        {showLinkInput && (
+          <div className="mb-3 p-3 bg-[#21262d] border border-[#30363d] rounded-lg">
+            <div className="flex items-center space-x-2">
+              <input
+                type="url"
+                value={attachedLink}
+                onChange={(e) => setAttachedLink(e.target.value)}
+                placeholder="Enter GitHub repository URL or link..."
+                className="flex-1 px-3 py-2 bg-[#0d1117] border border-[#30363d] rounded text-sm text-white focus:outline-none focus:border-[#1f6feb]"
+              />
+              <button
+                onClick={() => setShowLinkInput(false)}
+                className="p-2 hover:bg-[#30363d] rounded transition-colors"
+              >
+                <X className="w-4 h-4 text-[#8b949e]" />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Main Input */}
+        <div className="relative">
+          <div className="flex items-end space-x-2">
+            <div className="flex-1 relative">
+                             <textarea
+                 value={inputValue}
+                 onChange={handleTextareaChange}
+                 onKeyPress={handleKeyPress}
+                 placeholder="Message AI Assistant..."
+                 className="w-full px-4 py-3 pr-12 bg-[#21262d] border border-[#30363d] rounded-lg text-sm text-white placeholder-[#8b949e] focus:outline-none focus:border-[#1f6feb] resize-none"
+                 rows={1}
+                 disabled={chat.isLoading}
+                 style={{ minHeight: '44px', maxHeight: '120px' }}
+               />
+              
+              {/* Attachment Buttons */}
+              <div className="absolute right-2 bottom-2 flex items-center space-x-1">
+                <label className="cursor-pointer">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    className="p-1.5 hover:bg-[#30363d] rounded transition-colors"
+                    title="Attach image"
+                  >
+                    <Image className="w-4 h-4 text-[#8b949e] hover:text-[#1f6feb]" />
+                  </button>
+                </label>
+                
+                <button
+                  onClick={() => setShowLinkInput(true)}
+                  className="p-1.5 hover:bg-[#30363d] rounded transition-colors"
+                  title="Attach link"
+                >
+                  <Link className="w-4 h-4 text-[#8b949e] hover:text-[#1f6feb]" />
+                </button>
+                
+                <button
+                  onClick={() => setShowLinkInput(true)}
+                  className="p-1.5 hover:bg-[#30363d] rounded transition-colors"
+                  title="Attach Git repository"
+                >
+                  <GitBranch className="w-4 h-4 text-[#8b949e] hover:text-[#1f6feb]" />
+                </button>
+              </div>
+            </div>
+            
+            {/* Send Button */}
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputValue.trim() || chat.isLoading}
+              className={`p-3 rounded-lg transition-colors ${
+                inputValue.trim() && !chat.isLoading
+                  ? 'bg-[#1f6feb] hover:bg-[#388bfd] text-white'
+                  : 'bg-[#21262d] text-[#8b949e] cursor-not-allowed'
+              }`}
+            >
+              <Send className="w-4 h-4" />
+            </button>
+          </div>
         </div>
         
-        <div className="mt-2 text-xs text-white/40">
-          Press Enter to send, Shift+Enter for new line
+        <div className="mt-2 text-xs text-[#8b949e]">
+          Press Enter to send, Shift+Enter for new line • Use attachments for images, links, or Git repos
         </div>
       </div>
     </div>

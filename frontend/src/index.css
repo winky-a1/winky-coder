@@ -221,4 +221,44 @@
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.7);
   }
+  
+  /* Custom slider styles for Cursor theme */
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #1f6feb;
+    cursor: pointer;
+    border: 2px solid #0d1117;
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #1f6feb;
+    cursor: pointer;
+    border: 2px solid #0d1117;
+  }
+  
+  /* Auto-resize textarea */
+  textarea {
+    resize: none;
+    overflow-y: hidden;
+  }
+  
+  /* Smooth transitions */
+  * {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Custom focus styles */
+  .focus-ring:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #1f6feb;
+    ring-offset: 2px;
+    ring-offset-color: #0d1117;
+  }
 }
