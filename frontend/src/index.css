@@ -1,0 +1,264 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  html {
+    @apply h-full;
+  }
+  
+  #root {
+    @apply h-full;
+  }
+}
+
+@layer components {
+  /* Glassmorphism components */
+  .glass {
+    @apply backdrop-blur-md bg-white/10 border border-white/20;
+  }
+  
+  .glass-dark {
+    @apply backdrop-blur-md bg-black/10 border border-white/10;
+  }
+  
+  .glass-card {
+    @apply glass rounded-xl shadow-glass;
+  }
+  
+  .glass-card-dark {
+    @apply glass-dark rounded-xl shadow-glass-dark;
+  }
+  
+  /* Button components */
+  .btn-primary {
+    @apply px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply px-4 py-2 bg-secondary-600 hover:bg-secondary-700 text-white rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .btn-ghost {
+    @apply px-4 py-2 bg-transparent hover:bg-white/10 text-white rounded-lg font-medium transition-all duration-200;
+  }
+  
+  .btn-accent {
+    @apply px-4 py-2 bg-accent-600 hover:bg-accent-700 text-white rounded-lg font-medium transition-all duration-200;
+  }
+  
+  /* Input components */
+  .input-primary {
+    @apply px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  .input-dark {
+    @apply px-3 py-2 bg-black/20 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  /* Card components */
+  .card {
+    @apply glass-card p-6;
+  }
+  
+  .card-dark {
+    @apply glass-card-dark p-6;
+  }
+  
+  /* Panel components */
+  .panel {
+    @apply glass-card-dark p-4;
+  }
+  
+  .panel-header {
+    @apply flex items-center justify-between mb-4 pb-2 border-b border-white/10;
+  }
+  
+  .panel-title {
+    @apply text-lg font-semibold text-white;
+  }
+  
+  /* Sidebar components */
+  .sidebar {
+    @apply w-64 bg-black/20 backdrop-blur-md border-r border-white/10;
+  }
+  
+  .sidebar-item {
+    @apply flex items-center px-4 py-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-all duration-200 cursor-pointer;
+  }
+  
+  .sidebar-item.active {
+    @apply text-white bg-primary-600/20 border-r-2 border-primary-500;
+  }
+  
+  /* File tree components */
+  .file-tree {
+    @apply space-y-1;
+  }
+  
+  .file-item {
+    @apply flex items-center px-2 py-1 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded transition-all duration-200 cursor-pointer;
+  }
+  
+  .file-item.active {
+    @apply text-white bg-primary-600/20;
+  }
+  
+  .file-icon {
+    @apply w-4 h-4 mr-2;
+  }
+  
+  /* Chat components */
+  .chat-message {
+    @apply mb-4 p-4 rounded-lg;
+  }
+  
+  .chat-message.user {
+    @apply bg-primary-600/20 border border-primary-500/30;
+  }
+  
+  .chat-message.assistant {
+    @apply bg-white/10 border border-white/20;
+  }
+  
+  .chat-input {
+    @apply w-full p-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none;
+  }
+  
+  /* Code editor components */
+  .editor-container {
+    @apply h-full bg-slate-900;
+  }
+  
+  .editor-toolbar {
+    @apply flex items-center justify-between p-2 bg-slate-800 border-b border-slate-700;
+  }
+  
+  /* Status bar components */
+  .status-bar {
+    @apply flex items-center justify-between px-4 py-2 bg-slate-800 border-t border-slate-700 text-sm text-slate-300;
+  }
+  
+  /* Loading components */
+  .loading-spinner {
+    @apply animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500;
+  }
+  
+  .loading-dots {
+    @apply inline-block;
+  }
+  
+  /* Animation utilities */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .animate-glow {
+    animation: glow 2s ease-in-out infinite alternate;
+  }
+  
+  /* Responsive utilities */
+  .mobile-hidden {
+    @apply hidden md:block;
+  }
+  
+  .desktop-hidden {
+    @apply block md:hidden;
+  }
+}
+
+@layer utilities {
+  /* Custom utilities */
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent;
+  }
+  
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-primary-600 to-primary-800;
+  }
+  
+  .bg-gradient-accent {
+    @apply bg-gradient-to-r from-accent-600 to-accent-800;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  
+  .shadow-glow-accent {
+    box-shadow: 0 0 20px rgba(217, 70, 239, 0.3);
+  }
+  
+  /* Scrollbar utilities */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(156, 163, 175, 0.5);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.7);
+  }
+  
+  /* Custom slider styles for Cursor theme */
+  .slider::-webkit-slider-thumb {
+    appearance: none;
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #1f6feb;
+    cursor: pointer;
+    border: 2px solid #0d1117;
+  }
+  
+  .slider::-moz-range-thumb {
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    background: #1f6feb;
+    cursor: pointer;
+    border: 2px solid #0d1117;
+  }
+  
+  /* Auto-resize textarea */
+  textarea {
+    resize: none;
+    overflow-y: hidden;
+  }
+  
+  /* Smooth transitions */
+  * {
+    transition: all 0.2s ease-in-out;
+  }
+  
+  /* Custom focus styles */
+  .focus-ring:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: #1f6feb;
+    ring-offset: 2px;
+    ring-offset-color: #0d1117;
+  }
+}
