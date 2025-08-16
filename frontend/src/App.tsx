@@ -49,13 +49,15 @@ import { Terminal } from './components/Terminal';
 import { ProjectTemplates } from './components/ProjectTemplates';
 import { FullStackBuilder } from './components/FullStackBuilder';
 import { FirebaseStudio } from './components/FirebaseStudio';
+import { TextToAppGenerator } from './components/TextToAppGenerator';
 
 export default function App() {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isProjectTemplatesOpen, setIsProjectTemplatesOpen] = useState(false);
   const [isFullStackBuilderOpen, setIsFullStackBuilderOpen] = useState(false);
   const [isFirebaseStudioOpen, setIsFirebaseStudioOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'editor' | 'builder' | 'templates' | 'firebase'>('editor');
+  const [isTextToAppOpen, setIsTextToAppOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'editor' | 'builder' | 'templates' | 'firebase' | 'text-to-app'>('editor');
 
   const handleBuildApp = (template: any) => {
     console.log('Building app with template:', template);
@@ -128,6 +130,18 @@ export default function App() {
                           <Database className="w-4 h-4" />
                           Firebase Studio
                         </button>
+
+                        <button
+                          onClick={() => setCurrentView('text-to-app')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                            currentView === 'text-to-app'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                        >
+                          <Sparkles className="w-4 h-4" />
+                          Text-to-App
+                        </button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -161,6 +175,14 @@ export default function App() {
                           title="Firebase Studio"
                         >
                           <Database className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => setIsTextToAppOpen(true)}
+                          className="p-2 bg-purple-500 hover:bg-purple-600 rounded-lg transition-colors"
+                          title="Text-to-App Generator"
+                        >
+                          <Sparkles className="w-4 h-4" />
                         </button>
           </div>
         </div>
@@ -396,6 +418,28 @@ export default function App() {
                         </div>
                       </div>
                     )}
+
+                    {currentView === 'text-to-app' && (
+                      <div className="flex-1 p-6">
+                        <div className="max-w-6xl mx-auto">
+                          <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold mb-2">Text-to-App Generator</h1>
+                            <p className="text-slate-400 text-lg">
+                              Describe your app in plain English and get a working prototype
+                            </p>
+                          </div>
+
+                          <TextToAppGenerator
+                            isOpen={true}
+                            onClose={() => setCurrentView('editor')}
+                            onAppCreated={(appId) => {
+                              console.log('App created:', appId);
+                              setCurrentView('editor');
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
       </main>
 
       {/* Modals */}
@@ -408,6 +452,15 @@ export default function App() {
                   <FirebaseStudio
                     isOpen={isFirebaseStudioOpen}
                     onClose={() => setIsFirebaseStudioOpen(false)}
+                  />
+
+                  <TextToAppGenerator
+                    isOpen={isTextToAppOpen}
+                    onClose={() => setIsTextToAppOpen(false)}
+                    onAppCreated={(appId) => {
+                      console.log('App created:', appId);
+                      setIsTextToAppOpen(false);
+                    }}
                   />
 
       <ProjectTemplates

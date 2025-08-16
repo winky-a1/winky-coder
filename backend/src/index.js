@@ -14,6 +14,7 @@ import aiRoutes from './routes/ai.js';
 import fileRoutes from './routes/files.js';
 import fullStackBuilderRoutes from './routes/fullStackBuilder.js';
 import firebaseRoutes from './routes/firebase.js';
+import textToAppRoutes from './routes/textToApp.js';
 
 // Load environment variables
 dotenv.config();
@@ -75,6 +76,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/files', fileRoutes);
 app.use('/api/fullstack', fullStackBuilderRoutes);
 app.use('/api/firebase', firebaseRoutes);
+app.use('/api/text-to-app', textToAppRoutes);
 
 // Legacy MVP alias routes for compatibility
 app.post('/importRepo', (req, res, next) => repoRoutes.handle({ ...req, url: '/import' }, res, next));
