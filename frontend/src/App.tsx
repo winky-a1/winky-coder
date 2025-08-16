@@ -44,6 +44,7 @@ import {
   FolderOpen,
   Wrench,
   Palette as DesignIcon
+ Sparkles
 } from 'lucide-react';
 import { Terminal } from './components/Terminal';
 import { ProjectTemplates } from './components/ProjectTemplates';
