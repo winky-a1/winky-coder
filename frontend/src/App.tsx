@@ -48,12 +48,14 @@ import {
 import { Terminal } from './components/Terminal';
 import { ProjectTemplates } from './components/ProjectTemplates';
 import { FullStackBuilder } from './components/FullStackBuilder';
+import { FirebaseStudio } from './components/FirebaseStudio';
 
 export default function App() {
   const [isTerminalOpen, setIsTerminalOpen] = useState(false);
   const [isProjectTemplatesOpen, setIsProjectTemplatesOpen] = useState(false);
   const [isFullStackBuilderOpen, setIsFullStackBuilderOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'editor' | 'builder' | 'templates'>('editor');
+  const [isFirebaseStudioOpen, setIsFirebaseStudioOpen] = useState(false);
+  const [currentView, setCurrentView] = useState<'editor' | 'builder' | 'templates' | 'firebase'>('editor');
 
   const handleBuildApp = (template: any) => {
     console.log('Building app with template:', template);
@@ -103,17 +105,29 @@ export default function App() {
               Full-Stack Builder
             </button>
             
-            <button
-              onClick={() => setCurrentView('templates')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                currentView === 'templates' 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              <FolderOpen className="w-4 h-4" />
-              Templates
-            </button>
+                                    <button
+                          onClick={() => setCurrentView('templates')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                            currentView === 'templates'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                        >
+                          <FolderOpen className="w-4 h-4" />
+                          Templates
+                        </button>
+
+                        <button
+                          onClick={() => setCurrentView('firebase')}
+                          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
+                            currentView === 'firebase'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                          }`}
+                        >
+                          <Database className="w-4 h-4" />
+                          Firebase Studio
+                        </button>
           </div>
 
           <div className="flex items-center gap-2">
@@ -133,13 +147,21 @@ export default function App() {
               <FolderOpen className="w-4 h-4" />
             </button>
             
-            <button
-              onClick={() => setIsFullStackBuilderOpen(true)}
-              className="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
-              title="Full-Stack Builder"
-            >
-              <Rocket className="w-4 h-4" />
-            </button>
+                                    <button
+                          onClick={() => setIsFullStackBuilderOpen(true)}
+                          className="p-2 bg-blue-500 hover:bg-blue-600 rounded-lg transition-colors"
+                          title="Full-Stack Builder"
+                        >
+                          <Rocket className="w-4 h-4" />
+                        </button>
+
+                        <button
+                          onClick={() => setIsFirebaseStudioOpen(true)}
+                          className="p-2 bg-orange-500 hover:bg-orange-600 rounded-lg transition-colors"
+                          title="Firebase Studio"
+                        >
+                          <Database className="w-4 h-4" />
+                        </button>
           </div>
         </div>
       </header>
@@ -338,32 +360,55 @@ export default function App() {
           </div>
         )}
 
-        {currentView === 'templates' && (
-          <div className="flex-1 p-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-8">
-                <h1 className="text-3xl font-bold mb-2">Project Templates</h1>
-                <p className="text-slate-400 text-lg">
-                  Choose from 50+ pre-built templates to jumpstart your development
-                </p>
-              </div>
-              
-              <ProjectTemplates
-                isOpen={true}
-                onClose={() => setCurrentView('editor')}
-                onCreateProject={handleBuildApp}
-              />
-            </div>
-          </div>
-        )}
+                            {currentView === 'templates' && (
+                      <div className="flex-1 p-6">
+                        <div className="max-w-6xl mx-auto">
+                          <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold mb-2">Project Templates</h1>
+                            <p className="text-slate-400 text-lg">
+                              Choose from 50+ pre-built templates to jumpstart your development
+                            </p>
+                          </div>
+
+                          <ProjectTemplates
+                            isOpen={true}
+                            onClose={() => setCurrentView('editor')}
+                            onCreateProject={handleBuildApp}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {currentView === 'firebase' && (
+                      <div className="flex-1 p-6">
+                        <div className="max-w-6xl mx-auto">
+                          <div className="text-center mb-8">
+                            <h1 className="text-3xl font-bold mb-2">Firebase Studio</h1>
+                            <p className="text-slate-400 text-lg">
+                              AI-powered Firebase development with emulator testing and deployment
+                            </p>
+                          </div>
+
+                          <FirebaseStudio
+                            isOpen={true}
+                            onClose={() => setCurrentView('editor')}
+                          />
+                        </div>
+                      </div>
+                    )}
       </main>
 
       {/* Modals */}
-      <FullStackBuilder
-        isOpen={isFullStackBuilderOpen}
-        onClose={() => setIsFullStackBuilderOpen(false)}
-        onBuildApp={handleBuildApp}
-      />
+                        <FullStackBuilder
+                    isOpen={isFullStackBuilderOpen}
+                    onClose={() => setIsFullStackBuilderOpen(false)}
+                    onBuildApp={handleBuildApp}
+                  />
+
+                  <FirebaseStudio
+                    isOpen={isFirebaseStudioOpen}
+                    onClose={() => setIsFirebaseStudioOpen(false)}
+                  />
 
       <ProjectTemplates
         isOpen={isProjectTemplatesOpen}
