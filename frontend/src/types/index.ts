@@ -55,6 +55,7 @@ export interface AIModel {
   provider: string;
   model: string;
   available: boolean;
+  supportsVision?: boolean;
 }
 
 export interface AIRequest {
@@ -64,6 +65,7 @@ export interface AIRequest {
   files?: FileContent[];
   temperature?: number;
   maxTokens?: number;
+  imageData?: string;
 }
 
 export interface AIResponse {

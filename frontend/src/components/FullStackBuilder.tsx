@@ -20,7 +20,7 @@ import {
   Palette,
   Users,
   ShoppingCart,
-  ChartBar,
+  BarChart3,
   MessageSquare,
   Calendar,
   MapPin,

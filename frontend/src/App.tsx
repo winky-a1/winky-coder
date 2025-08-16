@@ -20,7 +20,7 @@ import {
   Palette,
   Users,
   ShoppingCart,
-  ChartBar,
+  BarChart3,
   MessageSquare,
   Calendar,
   MapPin,
@@ -374,7 +374,7 @@ export default function App() {
       <Terminal
         isOpen={isTerminalOpen}
         onToggle={toggleTerminal}
-        repoPath={null}
+        repoPath={undefined}
       />
     </div>
   );

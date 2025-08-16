@@ -4,11 +4,11 @@
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border-slate-700;
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-slate-900 text-white;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   

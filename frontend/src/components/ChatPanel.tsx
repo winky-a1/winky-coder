@@ -123,7 +123,13 @@ const ChatPanel: React.FC = () => {
         prompt: userMessage,
         model: chat.selectedModel,
         context,
-        files,
+        files: files.map(f => ({
+          path: f.path,
+          content: f.content,
+          size: f.content.length,
+          modified: new Date(),
+          encoding: 'utf-8'
+        })),
         temperature: chat.temperature,
         maxTokens: chat.maxTokens,
         imageData: selectedImage, // Add image data for vision
@@ -180,11 +186,11 @@ const ChatPanel: React.FC = () => {
     try {
       setChatLoading(true);
       
-      const response = await aiAPI.analyzeVision({
-        imageData: selectedImage,
-        prompt: 'Analyze this UI design and provide the HTML/CSS/JavaScript code to recreate it',
-        model: 'gemini-2.0-pro'
-      });
+      const response = await aiAPI.analyzeVision(
+        selectedImage,
+        "Analyze this UI design and provide a detailed description of the layout, components, and styling that can be used for coding implementation.",
+        'gemini-2.0-pro'
+      );
 
       addMessage({
         role: 'user',

@@ -1,14 +1,30 @@
-import { api, handle } from './api'
+import { repositoryAPI } from './api'
 import type { ApiResponse } from '@/types'
 
 export function importRepo(repoUrl: string, token?: string, branch: string = 'main') {
-  return handle<ApiResponse>(api.post('/api/repos/import', { repoUrl, token, branch }))
+  return repositoryAPI.importRepo(repoUrl, token || '', branch)
 }
 
-export function getRepoFiles(repoPath: string, path: string) {
-  return handle<ApiResponse>(api.get('/api/repos/files', { params: { repoPath, path } }))
+export function getFiles(repoPath: string, path: string = '') {
+  return repositoryAPI.getFiles(repoPath, path)
 }
 
 export function getFileContent(repoPath: string, filePath: string) {
-  return handle<ApiResponse>(api.get('/api/repos/file', { params: { repoPath, filePath } }))
+  return repositoryAPI.getFileContent(repoPath, filePath)
+}
+
+export function updateFile(repoPath: string, filePath: string, content: string, token?: string) {
+  return repositoryAPI.updateFile(repoPath, filePath, content, token || '')
+}
+
+export function getBranches(repoUrl: string, token?: string) {
+  return repositoryAPI.getBranches(repoUrl, token || '')
+}
+
+export function commitChanges(repoPath: string, message: string, files: any[], token?: string) {
+  return repositoryAPI.commitChanges(repoPath, message, files, token || '')
+}
+
+export function pullChanges(repoPath: string, token?: string) {
+  return repositoryAPI.pullChanges(repoPath, token || '')
 }

@@ -1,10 +1,10 @@
-import { api, handle } from './api'
+import { aiAPI } from './api'
 import type { ApiResponse, AIRequest } from '@/types'
 
 export function getModels() {
-  return handle<ApiResponse>(api.get('/api/ai/models'))
+  return aiAPI.getModels()
 }
 
-export function aiChat(body: AIRequest) {
-  return handle<ApiResponse>(api.post('/api/ai/chat', body))
+export function sendMessage(body: AIRequest) {
+  return aiAPI.sendRequest(body)
 }

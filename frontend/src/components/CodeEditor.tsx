@@ -1,15 +1,13 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { 
   Save, 
   FileText, 
   Settings, 
   Maximize, 
-  Minimize,
-  Download,
-  Upload
+  Minimize
 } from 'lucide-react';
 import Editor from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 import { useAppStore } from '@/stores/appStore';
 import { repositoryAPI } from '@/services/api';
 import toast from 'react-hot-toast';
@@ -227,7 +225,7 @@ const CodeEditor: React.FC = () => {
           theme={editor.theme}
           onChange={handleEditorChange}
           onMount={handleEditorDidMount}
-          onBlur={handleEditorBlur}
+
           options={{
             fontSize: editor.fontSize,
             wordWrap: editor.wordWrap,
@@ -246,7 +244,7 @@ const CodeEditor: React.FC = () => {
             folding: true,
             foldingStrategy: 'indentation',
             showFoldingControls: 'always',
-            unfoldOnClickAfterEnd: false,
+            unfoldOnClickAfterEndOfLine: false,
             contextmenu: true,
             mouseWheelZoom: true,
             quickSuggestions: true,
@@ -254,7 +252,7 @@ const CodeEditor: React.FC = () => {
             acceptSuggestionOnCommitCharacter: true,
             acceptSuggestionOnEnter: 'on',
             tabCompletion: 'on',
-            wordBasedSuggestions: true,
+            wordBasedSuggestions: "off",
             parameterHints: {
               enabled: true,
             },
@@ -267,10 +265,7 @@ const CodeEditor: React.FC = () => {
             lightbulb: {
               enabled: true,
             },
-            codeActionsOnSave: {
-              'source.fixAll': true,
-              'source.organizeImports': true,
-            },
+            // codeActionsOnSave removed - not supported in this version
           }}
         />
       </div>
