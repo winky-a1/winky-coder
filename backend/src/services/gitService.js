@@ -1,4 +1,5 @@
 import { clone, log, add, commit, push, pull, listBranches, listFiles, readBlob } from 'isomorphic-git';
+import http from 'isomorphic-git/http/node';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -33,6 +34,7 @@ export async function importRepository(repoUrl, token, branch = 'main') {
     // Clone repository
     await clone({
       fs,
+      http,
       dir: repoPath,
       url: repoUrl,
       ref: branch,
@@ -95,6 +97,7 @@ export async function commitChanges(repoPath, message, files, token) {
     // Push changes
     await push({
       fs,
+      http,
       dir: repoPath,
       onAuth: () => ({
         username: token,

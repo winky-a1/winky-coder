@@ -72,6 +72,11 @@ app.use('/api/repos', repoRoutes);
 app.use('/api/ai', aiRoutes);
 app.use('/api/files', fileRoutes);
 
+// Legacy MVP alias routes for compatibility
+app.post('/importRepo', (req, res, next) => repoRoutes.handle({ ...req, url: '/import' }, res, next));
+app.post('/commitChanges', (req, res, next) => repoRoutes.handle({ ...req, url: '/commit' }, res, next));
+app.post('/aiRequest', (req, res, next) => aiRoutes.handle({ ...req, url: '/chat' }, res, next));
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

@@ -22,13 +22,11 @@
     "tailwind-merge": "^2.2.0",
     "axios": "^1.6.2",
     "react-hot-toast": "^2.4.1",
-    "react-split-pane": "^0.1.92",
-    "react-resizable-panels": "^1.0.5",
-    "react-command-palette": "^1.0.0",
+
+
     "react-dropzone": "^14.2.3",
     "react-markdown": "^9.0.1",
-    "react-syntax-highlighter": "^15.5.0",
-    "prismjs": "^1.29.0",
+
     "date-fns": "^2.30.0",
     "uuid": "^9.0.1"
   },
